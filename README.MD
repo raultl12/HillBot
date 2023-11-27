@@ -11,5 +11,3 @@ off - Apaga el bot
 encrypt - Activa el modo codificacion de texto
 decrypt - Activa el modo decodificacion de texto
 ```
-
-Por ahora no soporta numeros, el diccionaro de codificación son las letras del alfabeto ingles mas el caracter _(barra baja)
