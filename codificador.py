@@ -87,6 +87,11 @@ class CodificadorHill:
         texto = ''.join(texto)
         return texto
     
+    # Funcion que cambia _ por espacios
+    def CambiarEspacios(self, texto):
+        texto = texto.replace('_', ' ')
+        return texto
+
     def Cifrar(self, texto:str):
         texto = self.NormalizarTexto(texto)
 
@@ -130,7 +135,10 @@ class CodificadorHill:
         productoMod = productoMod.T
         array = productoMod.flatten()
 
-        return self.ObtenerTexto(self.numCh, array)
+        resultado = self.ObtenerTexto(self.numCh, array).lower()
+        resultado = self.CambiarEspacios(resultado)
+
+        return resultado
         
         
     
