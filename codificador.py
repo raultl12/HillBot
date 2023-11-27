@@ -26,7 +26,7 @@ class Message:
         return filter(lambda x: x in self.alphabet,self._flatten(accum))
 
     def __init__(self,strng):
-        self.alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'
+        self.alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789'
         self.alphSpecials = {
             'Á' : 'A',
             'É' : 'E',
@@ -103,7 +103,7 @@ class CodificadorHill:
         
         # Hacer el producto de la clave y la matriz obtenida mod 27
         producto = self.clave @ matriz
-        productoMod = producto % 27
+        productoMod = producto % len(self.numCh)
         
         productoMod = productoMod.T
         array = productoMod.flatten()
@@ -125,7 +125,7 @@ class CodificadorHill:
         # Hacer el producto de la inversa de la clave por la matriz
         inversa = np.linalg.inv(self.clave).astype(int)
         producto = inversa @ matriz
-        productoMod = producto % 27
+        productoMod = producto % len(self.numCh)
 
         productoMod = productoMod.T
         array = productoMod.flatten()
@@ -163,7 +163,17 @@ class CodificadorHill:
             23:'X',
             24:'Y',
             25:'Z',
-            26:'_'
+            26:'_',
+            27:'0',
+            28:'1',
+            29:'2',
+            30:'3',
+            31:'4',
+            32:'5',
+            33:'6',
+            34:'7',
+            35:'8',
+            36:'9',
         }
 
         self.chNum = {v:i for i, v in self.numCh.items()}
