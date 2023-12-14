@@ -1,5 +1,6 @@
 from math import log
 from itertools import chain, groupby
+from sage.all import Matrix
 import numpy as np
 
 class Message:
@@ -95,8 +96,7 @@ class CodificadorHill:
     def Cifrar(self, texto:str):
         texto = self.NormalizarTexto(texto)
 
-        
-        # Hay que añadir espacios por si la longitud del texto no coincide con 
+        # Hay que añadir barras bajas por si la longitud del texto no coincide con 
         # la dimension de la clave (n)
         longitudTexto = len(texto)
         resto = longitudTexto % self.n
@@ -106,14 +106,14 @@ class CodificadorHill:
         textoNumeros = self.TransformarTexto(texto, self.chNum)
         matriz = self.ObtenerMatriz(textoNumeros)
         
-        # Hacer el producto de la clave y la matriz obtenida mod 27
+        # Hacer el producto de la clave y la matriz obtenida mod len(diccionario)
         producto = self.clave @ matriz
         productoMod = producto % len(self.numCh)
         
+        # Hacer la traspuesta para que flatten de el resultado adecuado
         productoMod = productoMod.T
         array = productoMod.flatten()
-        # convertir el array a texto usando el numch ya creado y sin dar formato
-        # No dar formato al array
+        # Convertir el array a texto usando el numch
 
         return self.ObtenerTexto(self.numCh, array)
 
@@ -128,10 +128,12 @@ class CodificadorHill:
         matriz = self.ObtenerMatriz(textoNumeros)
 
         # Hacer el producto de la inversa de la clave por la matriz
+        # y aplicar el módulo len(diccionario)
         inversa = np.linalg.inv(self.clave).astype(int)
         producto = inversa @ matriz
         productoMod = producto % len(self.numCh)
 
+        # Hacer la traspuesta par que flatten de el resultado adecuado
         productoMod = productoMod.T
         array = productoMod.flatten()
 
@@ -139,7 +141,42 @@ class CodificadorHill:
         resultado = self.CambiarEspacios(resultado)
 
         return resultado
+    
+
+
+    def Ataque_Gauss(self, texto_plano, texto_cifrado):
         
+        # Normalizamos el texto
+        texto_plano = self.NormalizarTexto(texto_plano)
+        
+        # Añadimos espacios si lo necesita
+        longitudTexto = len(texto_plano)
+        resto = longitudTexto % self.n
+        if(resto != 0):
+            texto_plano = self.AniadirEspacios(self.n-resto, texto_plano)
+        
+        # Obtenemos los índices correspondientes
+        texto_plano_numeros = self.TransformarTexto(texto_plano, self.chNum)
+        texto_cifrado_numeros = self.TransformarTexto(texto_cifrado, self.chNum)
+        
+        # Obtenemos las matrices con los índices según el diccionario
+        matriz_plano = self.ObtenerMatriz(texto_plano_numeros).T
+        matriz_cifrado = self.ObtenerMatriz(texto_cifrado_numeros).T
+        
+        # Convertimos la matriz de pyhton a una de sage
+        M = Matrix(matriz_plano)
+        C = Matrix(matriz_cifrado)
+        
+        # Creamos la matriz [M | C] para resolver el sistema de ecuaciones lineales
+        matriz_ampliada = M.augment(C)
+
+        # Aplicamos Gauss-Jordan
+        matriz_reducida = matriz_ampliada.rref() % len(self.numCh)
+
+        # Extraemos la matriz clave
+        matriz_clave = matriz_reducida[:, -len(M.columns()):].T
+        
+        return matriz_clave
         
     
     def __init__(self, n : int):
