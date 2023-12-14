@@ -8,9 +8,9 @@ user_name = 'hill_encoder_bot'
 bot = telebot.TeleBot(token)
 codificador = CodificadorHill(3)
 codificador.clave = np.array([
-    [35, 53, 12],
-    [12, 21, 5],
-    [2, 4, 1]
+    [1, 1, 0],
+    [1, 0, 1],
+    [0, 1, 0]
 ])
 
 estado_bot = {
